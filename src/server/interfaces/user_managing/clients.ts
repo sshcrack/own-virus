@@ -4,5 +4,10 @@ export interface GetClientsInterface {
 
 export interface ClientsInterfaceResponse {
   name: "clients",
-  data: string[]
+  data: SingleClient[]
+}
+
+export interface SingleClient {
+  id: string,
+  connected: boolean
 }

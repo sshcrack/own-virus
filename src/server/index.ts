@@ -1,5 +1,6 @@
 import express from "express";
 import ws from "ws";
+import { AddClient } from './client-config';
 import { ClientsInterface, WSEvent } from './interfaces/core/base';
 import { StatusInterface } from './interfaces/core/status';
 import { ExecInfo } from './interfaces/remote/instruction';
@@ -11,7 +12,7 @@ import { verifyClient } from './responses/verify';
 const app = express();
 const port = 3000;
 
-let registeredClients: ClientsInterface = {};
+let onlineClients: ClientsInterface = {};
 let master: ws;
 
 const wsServer = new ws.Server({ noServer: true });
@@ -34,7 +35,7 @@ wsServer.on('connection', socket => {
           if (!verified)
             break;
 
-          getClients(socket, registeredClients);
+          getClients(socket, onlineClients);
           break;
 
         case "verify":
@@ -52,7 +53,8 @@ wsServer.on('connection', socket => {
 
         case "id":
           if (!id) {
-            registeredClients[event.data.id] = socket;
+            onlineClients[event.data.id] = socket;
+            AddClient(event.data.id)
             id = event.data.id
           } else
             socket.close();
@@ -80,7 +82,7 @@ wsServer.on('connection', socket => {
           const data = event.data;
           if (verified && data.direction === "to_client") {
             const clientID = data.client;
-            const client = registeredClients[clientID];
+            const client = onlineClients[clientID];
             if (!client) {
               console.log("Client not found");
               break;
@@ -122,7 +124,7 @@ wsServer.on('connection', socket => {
 
   socket.on("close", () => {
     console.log("Deleting id", id, "...")
-    delete registeredClients[id]
+    delete onlineClients[id]
   })
 });
 
@@ -133,7 +135,7 @@ function handleInstruction(verified: boolean, json: ExecInfo) {
   }
 
   const client = json.client;
-  const target = registeredClients[client];
+  const target = onlineClients[client];
   if (!target) {
     console.log("Client not found")
     return;

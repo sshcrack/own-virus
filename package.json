@@ -1,6 +1,6 @@
 {
   "name": "server",
-  "version": "1.0.0",
+  "version": "0.0.2-DEV",
   "description": "Server",
   "main": "build/main/index.js",
   "typings": "build/main/index.d.ts",
@@ -9,8 +9,9 @@
   "license": "MIT",
   "keywords": [],
   "scripts": {
-    "master": "node -r source-map-support/register -r dotenv/config build/main/master/master.js",
-    "start": "node -r source-map-support/register -r dotenv/config build/main/server/index.js",
+    "master": "node -r source-map-support/register -r dotenv/config build/main/master",
+    "start": "node -r source-map-support/register -r dotenv/config build/main/server",
+    "cli": "node -r source-map-support/register -r dotenv/config build/main/cli",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.json",
     "build:module": "tsc -p tsconfig.module.json",
@@ -45,16 +46,20 @@
   "dependencies": {
     "@bitauth/libauth": "^1.17.1",
     "blessed": "^0.1.81",
+    "chalk": "^4.1.1",
     "dotenv": "^9.0.0",
     "express": "^4.17.1",
     "inquirer": "^8.0.0",
     "listr": "^0.14.3",
+    "rxjs": "^6.6.7",
     "source-map-support": "^0.5.19",
+    "term.js": "^0.0.7",
     "ws": "^7.4.5"
   },
   "devDependencies": {
     "@ava/typescript": "^1.1.1",
     "@istanbuljs/nyc-config-typescript": "^1.0.1",
+    "@types/blessed": "^0.1.17",
     "@types/inquirer": "^7.3.1",
     "@types/listr": "^0.14.3",
     "@types/node": "^15.0.2",
