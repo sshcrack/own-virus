@@ -20,7 +20,7 @@ export interface Command {
   execute(args: string[]): Observable<string[]> | string[]
   /**
    * Used for tab completion
-   * @param input The full command, that the user entered
+   * @param args The full command, that the user entered
    */
-  tab_complete(input: string): string[] | void
+  tab_complete(args: string[]): string[] | void
 }

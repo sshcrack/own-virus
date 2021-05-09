@@ -61,5 +61,7 @@ export class LoginCommand implements Command {
     });
   }
 
-  public tab_complete(_str) { }
+  public tab_complete(_str) {
+    return ["test"]
+  }
 }

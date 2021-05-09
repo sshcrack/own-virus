@@ -9,6 +9,7 @@ import { resetHelpCMDs } from '../tools';
 export function OnCommandSubmit() {
   const cmdLine = Global.cmdLine;
   const screen = Global.screen;
+  const currPrefix = Global.userInput.prefix;
 
   const fullCMD = Global.userInput.input
   const result = processCommand(fullCMD);
@@ -16,16 +17,19 @@ export function OnCommandSubmit() {
   const index = Global.history.push({
     command: true,
     text: fullCMD,
-    completed: false
+    completed: false,
+    prefix: currPrefix + ""
   }, {
     command: false,
-    text: chalk.yellow("Waiting for command feedback...")
+    text: chalk.yellow("Waiting for command feedback..."),
+    prefix: currPrefix + ""
   }) - 1
 
   result.subscribe(newStat => {
     Global.history[index] = {
       command: false,
-      text: newStat
+      text: newStat,
+      prefix: currPrefix + ""
     };
     screen.render();
   })

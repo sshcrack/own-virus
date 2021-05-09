@@ -11,20 +11,57 @@ import { UserInput } from '../interfaces/userinput';
 import { center } from '../tools';
 
 export class Global {
-  static tabOffset = 0;
-  static helpOffset = 0;
-  static beforeTabComplete: string;
-  static history: HistoryInfo[] = [];
+  /**
+   * All command line widgets
+   */
+
+  /**
+   * Currently used screen
+   */
   static screen: blessed.Widgets.Screen
+
+  /**
+   * Command line (input of the user)
+   */
   static cmdLine: blessed.Widgets.TextboxElement
+
+  /**
+   * The history of commands shown
+   */
   static historyElement: blessed.Widgets.Log
+
+  /**
+   * Used to get which tab offset
+   */
+  static tabOffset = 0;
+
+  /**
+   * This is the offset of how many times the user pressed arrow up
+   */
+  static arrowOffset = 0;
+
+  /**
+   * The string before tab completion
+   */
+  static beforeTabComplete: string;
+
+  /**
+   * Current history info
+   */
+  static history: HistoryInfo[] = [];
+
+  /**
+   * The websocket the client is connected with
+   */
   static socket: ws;
 
-  static prefix = `${chalk.white(">  ")}`
-  static standardPrefix = Global.prefix;
+  /**
+   * The standard prefix when the console is starting
+   */
+  static standardPrefix = `${chalk.white(">  ")}`;
 
   static userInput: UserInput = {
-    prefix: Global.prefix,
+    prefix: Global.standardPrefix,
     input: ""
   }
 
@@ -50,6 +87,7 @@ export class Global {
 
   static keys = {
     up: "1b5b41",
-    down: "1b5b42"
+    down: "1b5b42",
+    back: "\b"
   }
 }

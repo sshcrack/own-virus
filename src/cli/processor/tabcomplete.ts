@@ -4,12 +4,8 @@ import { Global } from '../Global/Global';
  * Used to find the command for tab completion
  */
 export function processTabComplete() {
-  const cmdLine = Global.cmdLine;
-  const prefix = Global.prefix;
+  const currCMD = Global.userInput.input;
   const screen = Global.screen;
-
-  const val = cmdLine.getValue();
-  const currCMD = val.substring(prefix.length);
 
   const currComplete = findTabComplete(Global.beforeTabComplete ?? currCMD, Global.tabOffset);
   if (currCMD !== currComplete)
@@ -36,5 +32,20 @@ export function findTabComplete(str: string, offset: number) {
   if (offset >= matchingCommands.length)
     offset -= matchingCommands.length;
 
-  return matchingCommands[offset]?.name ?? str;
+  const cmd = matchingCommands[offset];
+  if (!cmd)
+    return str;
+
+  if (args.length === 0)
+    return cmd?.name;
+
+  const complete = cmd.tab_complete(args)
+  if (!complete)
+    return str;
+
+
+  if (offset >= complete.length)
+    offset -= complete.length;
+
+  return `${command} ${complete[offset]}`;
 }

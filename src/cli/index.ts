@@ -81,7 +81,7 @@ function onLoaded() {
      */
     history.setContent(Global.history.map(e => {
       if (e.command)
-        return Global.prefix + chalk.green(e.text)
+        return e.prefix + chalk.green(e.text)
 
       return e.text;
     }).join("\n"))

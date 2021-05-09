@@ -89,7 +89,7 @@ export function middle(left: string, right: string) {
  */
 export function resetHelpCMDs() {
   Global.tabOffset = 0;
-  Global.helpOffset = -1;
+  Global.arrowOffset = -1;
   Global.beforeTabComplete = undefined;
 }
 

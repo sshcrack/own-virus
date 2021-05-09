@@ -5,9 +5,8 @@ import { validateCommand } from '../processor/command-process';
  * Sets the style green, if the command is valid
  * Red if not
  */
-export function stylizeTerminal() {
+export function stylizeTerminal(): boolean {
   const cmdLine = Global.cmdLine;
-  const screen = Global.screen;
 
   const fullCMD = Global.userInput.input;
 
@@ -18,5 +17,6 @@ export function stylizeTerminal() {
     cmdLine.style.fg = "yellow"
 
   if (cmdLine.style.fg !== prev)
-    screen.render();
+    return true
+  return false
 }

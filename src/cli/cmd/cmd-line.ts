@@ -2,11 +2,19 @@
 import blessed from "blessed";
 import { Global } from '../Global/Global';
 import { processTabComplete } from '../processor/tabcomplete';
-import { addQuit, resetHelpCMDs } from '../tools';
+import { addQuit, debug, resetHelpCMDs } from '../tools';
 import { checkArrowKeys } from './arrowFunc';
 import { OnCommandSubmit } from './command-submit';
 import { keepPrefix } from './prefix';
 import { stylizeTerminal } from './terminal-color';
+
+
+const notAllowedChars = [
+  "\t",
+  "\n",
+  "\r"
+]
+
 
 /**
  * Gets all elements within the console
@@ -14,7 +22,7 @@ import { stylizeTerminal } from './terminal-color';
  */
 export function getCommandElements() {
   const screen = Global.screen;
-  const prefix = Global.prefix;
+  const prefix = Global.userInput.prefix;
 
   const form = blessed.form({
     keys: true,
@@ -51,21 +59,30 @@ export function getCommandElements() {
   })
 
   process.stdin.addListener("data", b => {
+    let input = Global.userInput.input;
     const res = checkArrowKeys(b);
+    let rerender = res;
 
     const str = b.toString();
     if (str !== "\t" && !res) {
-      if (str.match(/./g))
-        Global.userInput.input += b.toString("utf-8")
+      if (!notAllowedChars.some(e => str.includes(e)))
+        input += str
+
+      if (str.includes(Global.keys.back))
+        input.substr(0, input.length - 1)
       resetHelpCMDs()
     }
 
+    Global.userInput.input = input;
+
     //PREVENTING OF DELETING PREFIX
-    keepPrefix();
+    rerender = rerender || keepPrefix();
 
 
     //SETTING INPUT COLOR
-    stylizeTerminal();
+    rerender = rerender || stylizeTerminal();
+    if (rerender)
+      Global.screen.render();
   })
 
   cmdLine.on("submit", _e => OnCommandSubmit())

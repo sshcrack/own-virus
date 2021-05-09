@@ -8,6 +8,7 @@ export interface CommandHistoryInterface {
   command: true,
   completed: boolean,
   text: string,
+  prefix: string
 }
 
 /**
@@ -15,5 +16,6 @@ export interface CommandHistoryInterface {
  */
 export interface NormalHistoryInterface {
   command: false,
-  text: string
+  text: string,
+  prefix: string
 }

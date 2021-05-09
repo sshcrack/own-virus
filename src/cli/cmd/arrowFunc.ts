@@ -1,5 +1,4 @@
 import { Global } from '../Global/Global';
-import { debug } from '../tools';
 
 /**
  * Checks if any arrow keys are pressed
@@ -20,14 +19,13 @@ export function checkArrowKeys(input: Buffer): boolean {
 
   switch (hex) {
     case Global.keys.up:
-      Global.helpOffset++;
+      Global.arrowOffset++;
       break;
 
     case Global.keys.down:
-      debug("Before subtract", Global.helpOffset)
-      Global.helpOffset--;
-      if (Global.helpOffset < 0)
-        Global.helpOffset = -1;
+      Global.arrowOffset--;
+      if (Global.arrowOffset < 0)
+        Global.arrowOffset = -1;
       break;
 
     default:
@@ -36,26 +34,26 @@ export function checkArrowKeys(input: Buffer): boolean {
 
 
   if (cond) {
-    let helpOffset = Global.helpOffset;
+    let arrowOffset = Global.arrowOffset;
 
-    if (helpOffset === -1) {
+    if (arrowOffset === -1) {
       Global.userInput.input = ""
       screen.render();
       return true;
     }
 
-    if (helpOffset > filteredHistory.length - 1) {
-      Global.helpOffset = filteredHistory.length - 1;
-      helpOffset = Global.helpOffset;
+    if (arrowOffset > filteredHistory.length - 1) {
+      Global.arrowOffset = filteredHistory.length - 1;
+      arrowOffset = Global.arrowOffset;
     }
 
-    const historyIndex = filteredHistory.length - 1 - helpOffset;
+    const historyIndex = filteredHistory.length - 1 - arrowOffset;
 
     Global.userInput.input = filteredHistory[historyIndex].text
     screen.render();
     return true;
   }
 
-  Global.helpOffset = -1;
+  Global.arrowOffset = -1;
   return false;
 }
