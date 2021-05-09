@@ -8,6 +8,9 @@ const pkgJson = JSON.parse(fs.readFileSync(path.join(process.cwd(), "package.jso
 const versionNumber = "v" + pkgJson.version;
 
 
+/**
+ * Adds the title of this custom terminal
+ */
 export function getNav() {
   const masterRaw = "MASTER"
   const masterTitle = `{bold}{red-fg}${masterRaw}{/bold}{/red-fg}`;

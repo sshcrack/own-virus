@@ -6,6 +6,7 @@ import { Command } from "./basic-command"
 export class HelpCommand implements Command {
   name = "help"
   help = "The command you are using"
+
   public execute(_args: string[]) {
     const commands = Global.commands;
 
@@ -20,5 +21,5 @@ export class HelpCommand implements Command {
     ]
   }
 
-  public tab_complete(_str, _offset) { }
+  public tab_complete(_str) { }
 }

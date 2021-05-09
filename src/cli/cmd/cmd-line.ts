@@ -3,13 +3,16 @@ import blessed from "blessed";
 import { Global } from '../Global/Global';
 import { processTabComplete } from '../processor/tabcomplete';
 import { addQuit, resetHelpCMDs } from '../tools';
-import { checkArrowFunc } from './arrowFunc';
+import { checkArrowKeys } from './arrowFunc';
 import { OnCommandSubmit } from './command-submit';
 import { keepPrefix } from './prefix';
 import { stylizeTerminal } from './terminal-color';
 
-
-export function getCmdLine() {
+/**
+ * Gets all elements within the console
+ * @returns The command lien form
+ */
+export function getCommandElements() {
   const screen = Global.screen;
   const prefix = Global.prefix;
 
@@ -48,10 +51,14 @@ export function getCmdLine() {
   })
 
   process.stdin.addListener("data", b => {
-    const res = checkArrowFunc(b);
+    const res = checkArrowKeys(b);
 
-    if (b.toString() !== "\t" && !res)
+    const str = b.toString();
+    if (str !== "\t" && !res) {
+      if (str.match(/./g))
+        Global.userInput.input += b.toString("utf-8")
       resetHelpCMDs()
+    }
 
     //PREVENTING OF DELETING PREFIX
     keepPrefix();

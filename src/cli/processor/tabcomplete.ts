@@ -1,5 +1,8 @@
 import { Global } from '../Global/Global';
 
+/**
+ * Used to find the command for tab completion
+ */
 export function processTabComplete() {
   const cmdLine = Global.cmdLine;
   const prefix = Global.prefix;
@@ -8,16 +11,21 @@ export function processTabComplete() {
   const val = cmdLine.getValue();
   const currCMD = val.substring(prefix.length);
 
-  const currComplete = tabComplete(Global.beforeTabComplete ?? currCMD, Global.tabOffset);
+  const currComplete = findTabComplete(Global.beforeTabComplete ?? currCMD, Global.tabOffset);
   if (currCMD !== currComplete)
     Global.beforeTabComplete = currCMD;
 
   Global.tabOffset++;
-  cmdLine.setValue(prefix + currComplete);
+  Global.userInput.input = currComplete;
   screen.render();
 }
 
-export function tabComplete(str: string, offset: number) {
+/**
+ * Finds the current tab completion for matching commands
+ * @param str The user input of which it should find the tab completion
+ * @param offset The amount of how many times the user pressed tab
+ */
+export function findTabComplete(str: string, offset: number) {
   const args = str.split(" ")
   const command = args.shift();
   const commands = Global.commands;

@@ -9,5 +9,5 @@ export class ExitCommand implements Command {
     return ["Exiting..."]
   }
 
-  public tab_complete(_str, _offset) { }
+  public tab_complete(_str) { }
 }

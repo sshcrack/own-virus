@@ -5,6 +5,10 @@ import { SocketEvent } from '../interfaces/socket';
 
 const { MASTER_KEY } = process.env;
 
+/**
+ * Verifies the currently connected as master to the server
+ * @returns a promise, which is used to determine if the validation has succeeded
+ */
 export function verifyMaster(): Promise<boolean> {
   return new Promise((resolve, reject) => {
     const { socket } = Global;
@@ -31,6 +35,9 @@ export function verifyMaster(): Promise<boolean> {
   });
 }
 
+/**
+ * Gets a list of all devices that were/are connected to this network
+ */
 export function listDevices(): Promise<SingleClient[]> {
   return new Promise((resolve, reject) => {
     const { socket } = Global;

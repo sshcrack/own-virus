@@ -3,9 +3,14 @@ import { Command } from '../commands/basic-command';
 import { Global } from '../Global/Global';
 import { finishObservable } from '../tools';
 
-export function processCommand(str: string) {
+/**
+ * Runs commands and gives their result trough an observable
+ * @param fullCmd The command that should be run
+ * @returns The command output through an observable
+ */
+export function processCommand(fullCmd: string) {
   return new Observable<string>(observer => {
-    const args = str.split(" ")
+    const args = fullCmd.split(" ")
     const command = args.shift();
     const commands = Global.commands;
 
@@ -23,7 +28,7 @@ export function processCommand(str: string) {
       return;
     }
 
-    finishObservable(res.join("\n"), observer);
+    finishObservable(res?.join("\n") ?? Global.notFoundMSG(), observer);
     return
   });
 

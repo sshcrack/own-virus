@@ -3,14 +3,14 @@ import { Global } from '../Global/Global';
 import { processCommand } from '../processor/command-process';
 import { resetHelpCMDs } from '../tools';
 
+/**
+ * Displays command feedback and runs commands
+ */
 export function OnCommandSubmit() {
   const cmdLine = Global.cmdLine;
-  const prefix = Global.prefix;
-  const history = Global.historyElement;
   const screen = Global.screen;
 
-  const val = cmdLine.getValue();
-  const fullCMD = val.substring(prefix.length)
+  const fullCMD = Global.userInput.input
   const result = processCommand(fullCMD);
 
   const index = Global.history.push({
@@ -41,15 +41,8 @@ export function OnCommandSubmit() {
 
 
 
-  cmdLine.setValue(prefix);
+  Global.userInput.input = ""
   cmdLine.focus();
-
-  history.setContent(Global.history.map(e => {
-    if (e.command)
-      return Global.prefix + chalk.green(e.text)
-
-    return e.text;
-  }).join("\n"))
 
   resetHelpCMDs();
   screen.render();

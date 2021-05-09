@@ -1,7 +1,8 @@
 import blessed from "blessed";
+import chalk from 'chalk';
 import fs from "fs";
 import ws from "ws";
-import { getCmdLine as addCMDLine } from './cmd/cmd-line';
+import { getCommandElements as addCMDLine } from './cmd/cmd-line';
 import { Global } from './Global/Global';
 import { verifyMaster } from './socket-master';
 import { getNav as addNav } from './top/nav';
@@ -39,6 +40,7 @@ Global.socket.on("open", async () => {
     sendError("Could not verify")
     process.exit(0);
   }
+
   onLoaded();
 })
 
@@ -47,6 +49,9 @@ Global.socket.on("close", () => {
   process.exit(0);
 })
 
+/**
+ * This function is called, when the websocket is connected and verified
+ */
 function onLoaded() {
   const screen = blessed.screen({
     smartCSR: true,
@@ -55,11 +60,37 @@ function onLoaded() {
 
   Global.screen = screen;
 
+  /**
+   * A list of widgets that should be added
+   */
   const addFuncs = [
     () => addNav(),
     () => addCMDLine()
   ]
 
-  addFuncs.forEach(e => e())
+  addFuncs.forEach(func => func())
+
+  /**
+   * Runs on every screen rerender
+   */
+  screen.on("render", () => {
+    const { historyElement: history, cmdLine } = Global;
+
+    /**
+     * Updates the history
+     */
+    history.setContent(Global.history.map(e => {
+      if (e.command)
+        return Global.prefix + chalk.green(e.text)
+
+      return e.text;
+    }).join("\n"))
+
+    /**
+     * Updates command line values to show the right input
+     */
+    cmdLine.setValue(Global.userInput.prefix + Global.userInput.input)
+  })
+
   screen.render();
 }

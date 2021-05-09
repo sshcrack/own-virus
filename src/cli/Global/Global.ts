@@ -1,13 +1,14 @@
 import blessed from "blessed";
 import chalk from "chalk";
+import ws from "ws";
+import { Command } from '../commands/basic-command';
+import { ExitCommand } from '../commands/exit';
 import { HelpCommand } from '../commands/help';
 import { ListCommand } from '../commands/list';
-import { TimerCommand } from '../commands/timer';
+import { LoginCommand } from '../commands/login';
 import { HistoryInfo } from '../interfaces/historyInfo';
+import { UserInput } from '../interfaces/userinput';
 import { center } from '../tools';
-import ws from "ws"
-import { ExitCommand } from '../commands/exit';
-import { Command } from '../commands/basic-command';
 
 export class Global {
   static tabOffset = 0;
@@ -20,11 +21,18 @@ export class Global {
   static socket: ws;
 
   static prefix = `${chalk.white(">  ")}`
+  static standardPrefix = Global.prefix;
+
+  static userInput: UserInput = {
+    prefix: Global.prefix,
+    input: ""
+  }
+
   static commands: Command[] = [
     new HelpCommand(),
     new ListCommand(),
     new ExitCommand(),
-    new TimerCommand()
+    new LoginCommand()
   ]
 
   static notFoundMSG = () => {

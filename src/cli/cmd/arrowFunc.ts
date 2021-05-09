@@ -1,9 +1,15 @@
 import { Global } from '../Global/Global';
 import { debug } from '../tools';
 
-export function checkArrowFunc(input: Buffer): boolean {
+/**
+ * Checks if any arrow keys are pressed
+ * If arrow up is pressed, shows previous command
+ * If arrow down is pressed, shows next command
+ * @param input The key that should be analyzed
+ */
+export function checkArrowKeys(input: Buffer): boolean {
   const hex = input.toString("hex")
-  const { prefix, history, cmdLine, screen } = Global;
+  const { history, screen } = Global;
   const filteredHistory = history.filter(e => e.command);
 
   const cond = hex === Global.keys.up || hex === Global.keys.down;
@@ -33,7 +39,7 @@ export function checkArrowFunc(input: Buffer): boolean {
     let helpOffset = Global.helpOffset;
 
     if (helpOffset === -1) {
-      cmdLine.setValue(prefix);
+      Global.userInput.input = ""
       screen.render();
       return true;
     }
@@ -45,8 +51,7 @@ export function checkArrowFunc(input: Buffer): boolean {
 
     const historyIndex = filteredHistory.length - 1 - helpOffset;
 
-    cmdLine.setValue(prefix + filteredHistory[historyIndex].text);
-
+    Global.userInput.input = filteredHistory[historyIndex].text
     screen.render();
     return true;
   }
