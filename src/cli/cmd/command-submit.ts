@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
 import { processCommand } from '../processor/command-process';
-import { debug, renderCMDLine, resetHelpCMDs } from '../tools';
+import { renderCMDLine, resetHelpCMDs } from '../tools';
 
 /**
  * Displays command feedback and runs commands
@@ -13,7 +13,6 @@ export function OnCommandSubmit() {
 
   const fullCMD = UserInput.input
   const result = processCommand(fullCMD);
-  debug("Full cmd length", fullCMD.length)
   if (fullCMD.length === 0) {
     return;
   }

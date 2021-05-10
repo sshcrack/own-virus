@@ -71,8 +71,14 @@ export function getCommandElements() {
 
     input += str.replace(replaceControlChars, "");
 
-    if (hex.includes(Global.keys.back))
+    if (hex.includes(Global.keys.wordBack)) {
+      const phrases = input.split(" ");
+      phrases.pop();
+
+      input = phrases.join(" ")
+    } else if (hex.includes(Global.keys.back)) {
       input = input.substr(0, input.length - 1)
+    }
 
     UserInput.input = input;
     shouldRender = shouldRender || keepPrefix();

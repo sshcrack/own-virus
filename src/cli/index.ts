@@ -6,7 +6,6 @@ import { getCommandElements as addCMDLine } from './cmd/cmd-line';
 import { Global } from './Global/Global';
 import { UserInput } from './Global/UserInput';
 import { verifyMaster } from './socket-master';
-import { debug } from './tools';
 import { getNav as addNav } from './top/nav';
 
 const { URL } = process.env;
@@ -102,7 +101,6 @@ function onLoaded() {
    */
     const newLine = prefix + input
 
-    debug(newLine);
     cmdLine.setValue(newLine)
     screen.render();
   })

@@ -88,7 +88,8 @@ export class Global {
   static keys = {
     up: "1b5b41",
     down: "1b5b42",
-    back: "08"
+    back: "08",
+    wordBack: "1b08"
   }
 
   static fetchedClients: SingleClient[] = []
