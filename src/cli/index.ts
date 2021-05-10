@@ -4,15 +4,18 @@ import fs from "fs";
 import ws from "ws";
 import { getCommandElements as addCMDLine } from './cmd/cmd-line';
 import { Global } from './Global/Global';
+import { UserInput } from './Global/UserInput';
 import { verifyMaster } from './socket-master';
+import { debug } from './tools';
 import { getNav as addNav } from './top/nav';
 
 const { URL } = process.env;
 
+UserInput.prefix = Global.standardPrefix;
 
 const sendError = s => console.log("\n\n\n", s, "\n\n\n")
-
 fs.writeFileSync("debug.txt", "")
+
 
 const loadingScreen = blessed.screen({
   smartCSR: true,
@@ -74,22 +77,34 @@ function onLoaded() {
    * Runs on every screen rerender
    */
   screen.on("render", () => {
-    const { historyElement: history, cmdLine } = Global;
+    const { historyElement: history, } = Global;
 
     /**
      * Updates the history
      */
-    history.setContent(Global.history.map(e => {
+    const newHistory = Global.history.map(e => {
       if (e.command)
         return e.prefix + chalk.green(e.text)
 
       return e.text;
-    }).join("\n"))
+    }).join("\n");
+
+    if (history.getContent() !== newHistory)
+      history.setContent(newHistory)
+  })
+
+  UserInput.inputEvent.subscribe(input => {
+    const prefix = UserInput.prefix;
+    const { cmdLine } = Global;
 
     /**
-     * Updates command line values to show the right input
-     */
-    cmdLine.setValue(Global.userInput.prefix + Global.userInput.input)
+   * Updates command line values to show the right input
+   */
+    const newLine = prefix + input
+
+    debug(newLine);
+    cmdLine.setValue(newLine)
+    screen.render();
   })
 
   screen.render();

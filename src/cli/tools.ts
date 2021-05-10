@@ -2,6 +2,7 @@ import blessed from "blessed";
 import fs from "fs";
 import { Subscriber } from 'rxjs';
 import { Global } from './Global/Global';
+import { UserInput } from './Global/UserInput';
 
 /**
  * Joins an array to a single variable and returns it
@@ -33,14 +34,12 @@ export function debug(str: string, ...args: any[]) {
  */
 export function addQuit(node: blessed.Widgets.NodeWithEvents) {
   node.key(['escape', 'q', 'C-c'], () => {
-    const { userInput, screen } = Global;
-
-    if (userInput.input.length === 0) {
+    if (UserInput.input.length === 0) {
       process.exit(0);
     }
     else {
-      Global.userInput.input = ""
-      screen.render();
+      UserInput.input = ""
+      renderCMDLine();
     }
   });
 }
@@ -101,4 +100,11 @@ export function resetHelpCMDs() {
 export function finishObservable<T>(msg: T, observer: Subscriber<T>) {
   observer.next(msg)
   observer.complete();
+}
+
+/**
+ * Render cmd Line
+ */
+export function renderCMDLine() {
+  Global.screen.render();
 }

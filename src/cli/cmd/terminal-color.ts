@@ -1,4 +1,5 @@
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
 import { validateCommand } from '../processor/command-process';
 
 /**
@@ -8,7 +9,7 @@ import { validateCommand } from '../processor/command-process';
 export function stylizeTerminal(): boolean {
   const cmdLine = Global.cmdLine;
 
-  const fullCMD = Global.userInput.input;
+  const fullCMD = UserInput.input;
 
   const prev = cmdLine.style.fg;
   if (validateCommand(fullCMD))

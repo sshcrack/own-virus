@@ -2,6 +2,7 @@ import chalk from 'chalk';
 import { Observable } from 'rxjs';
 import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
 import { listDevices } from '../socket-master';
 import { center, finishObservable } from '../tools';
 import { Command } from "./basic-command";
@@ -38,8 +39,7 @@ export class LoginCommand implements Command {
           return;
         }
 
-        Global.userInput.prefix = chalk`{gray ${found.id}} ${Global.standardPrefix}`
-
+        UserInput.prefix = chalk`{gray ${found.id}} ${Global.standardPrefix}`
         observer.next([center(`green{Logged in.}`)]);
         observer.complete();
       }
@@ -62,6 +62,6 @@ export class LoginCommand implements Command {
   }
 
   public tab_complete(_str) {
-    return ["test"]
+    return Global.fetchedClients.map(e => e.id) ?? []
   }
 }

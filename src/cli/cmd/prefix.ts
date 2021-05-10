@@ -1,16 +1,18 @@
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
+
 
 /**
  * Ensures, that the user cant delete the prefix
  * @returns wether screen should rerender
  */
 export function keepPrefix(): boolean {
-  const prefix = Global.userInput.prefix;
+  const prefix = UserInput.prefix;
   const cmdLine = Global.cmdLine;
-  const value = cmdLine.getValue();
+  const value = cmdLine.getContent();
 
   if (value.length < prefix.length) {
-    Global.userInput.input = ""
+    UserInput.input = ""
     return true;
   }
 

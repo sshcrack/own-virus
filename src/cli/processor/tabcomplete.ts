@@ -1,19 +1,20 @@
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
+import { renderCMDLine } from '../tools';
 
 /**
  * Used to find the command for tab completion
  */
 export function processTabComplete() {
-  const currCMD = Global.userInput.input;
-  const screen = Global.screen;
+  const currCMD = UserInput.input;
 
   const currComplete = findTabComplete(Global.beforeTabComplete ?? currCMD, Global.tabOffset);
   if (currCMD !== currComplete)
     Global.beforeTabComplete = currCMD;
 
   Global.tabOffset++;
-  Global.userInput.input = currComplete;
-  screen.render();
+  UserInput.input = currComplete;
+  renderCMDLine();
 }
 
 /**

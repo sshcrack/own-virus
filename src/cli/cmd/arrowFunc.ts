@@ -1,4 +1,5 @@
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
 
 /**
  * Checks if any arrow keys are pressed
@@ -8,7 +9,7 @@ import { Global } from '../Global/Global';
  */
 export function checkArrowKeys(input: Buffer): boolean {
   const hex = input.toString("hex")
-  const { history, screen } = Global;
+  const { history } = Global;
   const filteredHistory = history.filter(e => e.command);
 
   const cond = hex === Global.keys.up || hex === Global.keys.down;
@@ -37,8 +38,7 @@ export function checkArrowKeys(input: Buffer): boolean {
     let arrowOffset = Global.arrowOffset;
 
     if (arrowOffset === -1) {
-      Global.userInput.input = ""
-      screen.render();
+      UserInput.input = ""
       return true;
     }
 
@@ -49,8 +49,7 @@ export function checkArrowKeys(input: Buffer): boolean {
 
     const historyIndex = filteredHistory.length - 1 - arrowOffset;
 
-    Global.userInput.input = filteredHistory[historyIndex].text
-    screen.render();
+    UserInput.input = filteredHistory[historyIndex].text
     return true;
   }
 

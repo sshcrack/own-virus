@@ -1,20 +1,64 @@
+import { Notifier } from '../Notifier/Notifier';
+import { Updater } from '../Notifier/Updater';
+import { Global } from './Global';
+
 export class UserInput {
-  private static input: string;
-  private static prefix: string;
+  /**
+   * This is the manager. `next` is called when a new input is received
+   */
+  static inputEvent = new Notifier<string>(e => {
+    UserInput._subscriberInput = e
+  });
 
-  static getInput() {
-    return UserInput.input;
+  /**
+   * This notifies all subscribed functions
+   */
+  private static _subscriberInput: Updater<string>;
+
+  /**
+   * Check if current input is already initialized
+   */
+  private static _initialized = false;
+  /**
+   * Represents the current input
+   */
+  private static _currInput = ""
+
+  private static _currPrefix: string;
+
+  /**
+   * Gets the current prefix or falls back to standard prefix
+   */
+  static get prefix() {
+    return this._currPrefix ?? Global.standardPrefix;
   }
 
-  static setInput(str: string) {
-    return UserInput.input = str;
+  /**
+   * Sets the current prefix
+   */
+  static set prefix(str: string) {
+    this._currPrefix = str;
   }
 
-  static getPrefix() {
-    return UserInput.prefix;
+
+  /**
+   * Just getting the current value
+   */
+  static get input() {
+    return this._currInput;
   }
 
-  static setPrefix(str: string) {
-    return UserInput.prefix = str;
+  /**
+   * Subscribing if the to observer if not already
+   */
+  static set input(str: string) {
+    if (!this._initialized) {
+      this.inputEvent.subscribe(e => {
+        this._currInput = e
+      })
+      this._initialized = true
+    }
+
+    this._subscriberInput.update(str)
   }
 }

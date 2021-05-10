@@ -1,5 +1,6 @@
 import chalk from 'chalk';
 import { Observable } from 'rxjs';
+import { Global } from '../Global/Global';
 import { listDevices } from '../socket-master';
 import { center, finishObservable, middle } from '../tools';
 import { Command } from "./basic-command"
@@ -14,6 +15,7 @@ export class ListCommand implements Command {
 
         const deviceProm = listDevices();
         deviceProm.then(devices => {
+          Global.fetchedClients = devices;
           finishObservable([
             title,
             ...devices.map(e => {
@@ -32,5 +34,7 @@ export class ListCommand implements Command {
     });
   }
 
-  public tab_complete(_str) { }
+  public tab_complete(_str) {
+    return ["one", "two", "three"]
+  }
 }

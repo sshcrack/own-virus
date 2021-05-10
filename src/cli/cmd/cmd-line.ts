@@ -1,20 +1,15 @@
 
 import blessed from "blessed";
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
 import { processTabComplete } from '../processor/tabcomplete';
-import { addQuit, debug, resetHelpCMDs } from '../tools';
+import { addQuit, renderCMDLine, resetHelpCMDs } from '../tools';
 import { checkArrowKeys } from './arrowFunc';
 import { OnCommandSubmit } from './command-submit';
 import { keepPrefix } from './prefix';
 import { stylizeTerminal } from './terminal-color';
 
-
-const notAllowedChars = [
-  "\t",
-  "\n",
-  "\r"
-]
-
+const replaceControlChars = /[\u0000-\u001F\u007F-\u009F]/g
 
 /**
  * Gets all elements within the console
@@ -22,7 +17,7 @@ const notAllowedChars = [
  */
 export function getCommandElements() {
   const screen = Global.screen;
-  const prefix = Global.userInput.prefix;
+  const prefix = UserInput.prefix;
 
   const form = blessed.form({
     keys: true,
@@ -59,33 +54,32 @@ export function getCommandElements() {
   })
 
   process.stdin.addListener("data", b => {
-    let input = Global.userInput.input;
-    const res = checkArrowKeys(b);
-    let rerender = res;
-
+    const hex = b.toString("hex");
     const str = b.toString();
-    if (str !== "\t" && !res) {
-      if (!notAllowedChars.some(e => str.includes(e)))
-        input += str
 
-      if (str.includes(Global.keys.back))
-        input.substr(0, input.length - 1)
-      resetHelpCMDs()
+    if (b.toString("hex") === "0d") {
+      OnCommandSubmit()
+      return;
     }
 
-    Global.userInput.input = input;
+    const res = checkArrowKeys(b);
+    let shouldRender = res;
 
-    //PREVENTING OF DELETING PREFIX
-    rerender = rerender || keepPrefix();
+    let input = UserInput.input;
+    if (str !== "\t" && !res)
+      resetHelpCMDs()
 
+    input += str.replace(replaceControlChars, "");
 
-    //SETTING INPUT COLOR
-    rerender = rerender || stylizeTerminal();
-    if (rerender)
-      Global.screen.render();
+    if (hex.includes(Global.keys.back))
+      input = input.substr(0, input.length - 1)
+
+    UserInput.input = input;
+    shouldRender = shouldRender || keepPrefix();
+    shouldRender = shouldRender || stylizeTerminal();
+    if (shouldRender)
+      renderCMDLine();
   })
-
-  cmdLine.on("submit", _e => OnCommandSubmit())
 
   cmdLine.key("tab", () => processTabComplete())
 

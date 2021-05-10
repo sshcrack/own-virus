@@ -5,10 +5,11 @@ import { Command } from '../commands/basic-command';
 import { ExitCommand } from '../commands/exit';
 import { HelpCommand } from '../commands/help';
 import { ListCommand } from '../commands/list';
+import { ClearCommand } from '../commands/clear';
 import { LoginCommand } from '../commands/login';
 import { HistoryInfo } from '../interfaces/historyInfo';
-import { UserInput } from '../interfaces/userinput';
 import { center } from '../tools';
+import { SingleClient } from '../../server/interfaces/user_managing/clients';
 
 export class Global {
   /**
@@ -60,16 +61,12 @@ export class Global {
    */
   static standardPrefix = `${chalk.white(">  ")}`;
 
-  static userInput: UserInput = {
-    prefix: Global.standardPrefix,
-    input: ""
-  }
-
   static commands: Command[] = [
     new HelpCommand(),
     new ListCommand(),
     new ExitCommand(),
-    new LoginCommand()
+    new LoginCommand(),
+    new ClearCommand()
   ]
 
   static notFoundMSG = () => {
@@ -85,9 +82,14 @@ export class Global {
   }
 
 
+  /**
+   * A list of all keys
+   */
   static keys = {
     up: "1b5b41",
     down: "1b5b42",
-    back: "\b"
+    back: "08"
   }
+
+  static fetchedClients: SingleClient[] = []
 }

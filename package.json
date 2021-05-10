@@ -37,6 +37,7 @@
     "blessed": "^0.1.81",
     "chalk": "^4.1.1",
     "dotenv": "^9.0.0",
+    "execution-time": "^1.4.1",
     "express": "^4.17.1",
     "inquirer": "^8.0.0",
     "listr": "^0.14.3",

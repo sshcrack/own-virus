@@ -1,18 +1,22 @@
 import chalk from 'chalk';
 import { Global } from '../Global/Global';
+import { UserInput } from '../Global/UserInput';
 import { processCommand } from '../processor/command-process';
-import { resetHelpCMDs } from '../tools';
+import { debug, renderCMDLine, resetHelpCMDs } from '../tools';
 
 /**
  * Displays command feedback and runs commands
  */
 export function OnCommandSubmit() {
   const cmdLine = Global.cmdLine;
-  const screen = Global.screen;
-  const currPrefix = Global.userInput.prefix;
+  const currPrefix = UserInput.prefix;
 
-  const fullCMD = Global.userInput.input
+  const fullCMD = UserInput.input
   const result = processCommand(fullCMD);
+  debug("Full cmd length", fullCMD.length)
+  if (fullCMD.length === 0) {
+    return;
+  }
 
   const index = Global.history.push({
     command: true,
@@ -31,23 +35,25 @@ export function OnCommandSubmit() {
       text: newStat,
       prefix: currPrefix + ""
     };
-    screen.render();
+    renderCMDLine();
   })
 
   result.toPromise().then(() => {
     const entry = Global.history[index]
-    if (entry.command)
-      entry.completed = true;
+    if (entry) {
+      if (entry.command)
+        entry.completed = true;
 
-    Global.history[index] = entry;
-    screen.render();
+      Global.history[index] = entry;
+    }
+    renderCMDLine();
   })
 
 
 
-  Global.userInput.input = ""
+  UserInput.input = ""
   cmdLine.focus();
 
   resetHelpCMDs();
-  screen.render();
+  renderCMDLine();
 }
