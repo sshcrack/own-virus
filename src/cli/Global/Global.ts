@@ -1,15 +1,16 @@
 import blessed from "blessed";
 import chalk from "chalk";
 import ws from "ws";
-import { Command } from '../commands/basic-command';
+import { Command, ForegroundCommand } from '../commands/basic-command';
 import { ExitCommand } from '../commands/exit';
 import { HelpCommand } from '../commands/help';
 import { ListCommand } from '../commands/list';
 import { ClearCommand } from '../commands/clear';
 import { LoginCommand } from '../commands/login';
 import { HistoryInfo } from '../interfaces/historyInfo';
-import { center } from '../tools';
+import { center } from '../tools/tools';
 import { SingleClient } from '../../server/interfaces/user_managing/clients';
+import { ShellCommand } from '../commands/shell';
 
 export class Global {
   /**
@@ -66,7 +67,8 @@ export class Global {
     new ListCommand(),
     new ExitCommand(),
     new LoginCommand(),
-    new ClearCommand()
+    new ClearCommand(),
+    new ShellCommand()
   ]
 
   static notFoundMSG = () => {
@@ -89,8 +91,11 @@ export class Global {
     up: "1b5b41",
     down: "1b5b42",
     back: "08",
-    wordBack: "1b08"
+    wordBack: "1b08",
+    newline: "0d"
   }
 
   static fetchedClients: SingleClient[] = []
+
+  static currCommand: ForegroundCommand;
 }

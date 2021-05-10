@@ -1,6 +1,6 @@
-import { Command } from "./basic-command"
+import { BackgroundCommand } from "./basic-command"
 
-export class ExitCommand implements Command {
+export class ExitCommand implements BackgroundCommand {
   name = "exit"
   help = "Exit this command line"
   public execute(_args: string[]) {

@@ -1,6 +1,6 @@
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
-import { renderCMDLine } from '../tools';
+import { renderCMDLine } from '../tools/tools';
 
 /**
  * Used to find the command for tab completion

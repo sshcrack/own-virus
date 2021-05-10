@@ -4,10 +4,10 @@ import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
 import { listDevices } from '../socket-master';
-import { center, finishObservable } from '../tools';
-import { Command } from "./basic-command";
+import { center, finishObservable } from '../tools/tools';
+import { BackgroundCommand } from "./basic-command";
 
-export class LoginCommand implements Command {
+export class LoginCommand implements BackgroundCommand {
   name = "login"
   help = "Log into a device connected to this network"
   public execute(args: string[]) {

@@ -2,7 +2,7 @@ import chalk from 'chalk';
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
 import { processCommand } from '../processor/command-process';
-import { renderCMDLine, resetHelpCMDs } from '../tools';
+import { renderCMDLine, resetHelpCMDs } from '../tools/tools';
 
 /**
  * Displays command feedback and runs commands

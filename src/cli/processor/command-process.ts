@@ -1,7 +1,7 @@
 import { Observable } from 'rxjs';
-import { Command } from '../commands/basic-command';
+import { Command, ForegroundCommand } from '../commands/basic-command';
 import { Global } from '../Global/Global';
-import { finishObservable } from '../tools';
+import { finishObservable } from '../tools/tools';
 
 /**
  * Runs commands and gives their result trough an observable
@@ -18,11 +18,18 @@ export function processCommand(fullCmd: string) {
     const res = found?.execute(args);
 
     if (res instanceof Observable) {
+      const isForeground = Object.keys(found).includes("on_input");
+      if (isForeground)
+        Global.currCommand = found as ForegroundCommand;
+
       res.subscribe(data => {
         observer.next(data.join("\n"));
       })
 
       res.toPromise().then(_e => {
+        if (isForeground)
+          Global.currCommand = undefined;
+
         observer.complete();
       })
       return;

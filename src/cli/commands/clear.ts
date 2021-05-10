@@ -1,7 +1,7 @@
 import { Global } from '../Global/Global'
-import { Command } from "./basic-command"
+import { BackgroundCommand } from "./basic-command"
 
-export class ClearCommand implements Command {
+export class ClearCommand implements BackgroundCommand {
   name = "clear"
   help = "Clear the command line"
   public execute(_args: string[]) {

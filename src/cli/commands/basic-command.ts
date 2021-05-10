@@ -1,9 +1,21 @@
 import { Observable } from 'rxjs';
 
+export type Command = BackgroundCommand | ForegroundCommand;
+
 /**
- * Is implemented by all terminal commands
+ * Used for commands which do not need user input
  */
-export interface Command {
+export interface BackgroundCommand extends _StructureCommand {
+}
+
+/**
+ * Used for commands that require user input
+ */
+export interface ForegroundCommand extends _StructureCommand {
+  on_input(input: string): void;
+}
+
+interface _StructureCommand {
   /**
    * Name of this command
    */

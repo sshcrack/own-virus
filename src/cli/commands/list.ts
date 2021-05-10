@@ -2,10 +2,10 @@ import chalk from 'chalk';
 import { Observable } from 'rxjs';
 import { Global } from '../Global/Global';
 import { listDevices } from '../socket-master';
-import { center, finishObservable, middle } from '../tools';
-import { Command } from "./basic-command"
+import { center, finishObservable, middle } from '../tools/tools';
+import { BackgroundCommand } from './basic-command';
 
-export class ListCommand implements Command {
+export class ListCommand implements BackgroundCommand {
   name = "list"
   help = "Get a list of all devices connected"
   public execute(_args: string[]) {

@@ -2,46 +2,76 @@
 import blessed from "blessed";
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
+import { RLKey } from '../interfaces/readline';
 import { processTabComplete } from '../processor/tabcomplete';
-import { addQuit, renderCMDLine, resetHelpCMDs } from '../tools';
+import { isAbort, isAlphanumericKey, isBackspace, isReturn, isSpecial, isTab, isWordDelete } from '../tools/key-checks';
+import { renderCMDLine, resetHelpCMDs } from '../tools/tools';
 import { checkArrowKeys } from './arrowFunc';
 import { OnCommandSubmit } from './command-submit';
 import { keepPrefix } from './prefix';
 import { stylizeTerminal } from './terminal-color';
-
-const replaceControlChars = /[\u0000-\u001F\u007F-\u009F]/g
 
 /**
  * Gets all elements within the console
  * @returns The command lien form
  */
 export function getCommandElements() {
-  const screen = Global.screen;
-  const prefix = UserInput.prefix;
+  const form = setForm();
 
-  const form = blessed.form({
-    keys: true,
-    parent: screen,
-    bg: "red",
-    height: "shrink",
-    align: 'center',
-    width: "100%",
-    top: "99%",
+  setCMDLine(form);
+  setHistory();
+
+  process.stdin.on("keypress", (_raw: string, key: RLKey) => {
+    let { input } = UserInput;
+
+    if (isTab(key))
+      return processTabComplete()
+
+    if (isAbort(key))
+      process.exit(0)
+
+    if (isReturn(key)) {
+      if (!Global.currCommand) {
+        OnCommandSubmit()
+        return;
+      }
+
+      Global.currCommand.on_input(UserInput.input);
+      return;
+    }
+
+    checkArrowKeys(key);
+    if (isAlphanumericKey(key))
+      input += key.sequence
+
+    if (!isTab(key) && isSpecial(key))
+      resetHelpCMDs()
+
+
+    /**
+     * Checking if control and back is pressed
+     */
+    if (isWordDelete(key)) {
+      const phrases = input.split(" ");
+      phrases.pop();
+
+      input = phrases.join(" ")
+    }
+
+    if (isBackspace(key))
+      input = input.substr(0, input.length - 1)
+
+
+    UserInput.input = input;
+    if (stylizeTerminal() || keepPrefix())
+      renderCMDLine();
   })
 
-  const cmdLine = blessed.textbox({
-    parent: form,
-    inputOnFocus: true,
-    tags: true,
-    name: "command",
-    style: {
-      fg: "yellow"
-    },
-    value: prefix
-  })
+  return form
+}
 
-  Global.cmdLine = cmdLine;
-
+function setHistory() {
+  const { screen } = Global;
   Global.historyElement = blessed.log({
     parent: screen,
     content: "",
@@ -52,47 +82,35 @@ export function getCommandElements() {
     scrollable: true,
     alwaysScroll: true,
   })
+}
 
-  process.stdin.addListener("data", b => {
-    const hex = b.toString("hex");
-    const str = b.toString();
+function setCMDLine(form: blessed.Widgets.FormElement<unknown>) {
+  const prefix = UserInput.prefix;
 
-    if (b.toString("hex") === "0d") {
-      OnCommandSubmit()
-      return;
-    }
-
-    const res = checkArrowKeys(b);
-    let shouldRender = res;
-
-    let input = UserInput.input;
-    if (str !== "\t" && !res)
-      resetHelpCMDs()
-
-    input += str.replace(replaceControlChars, "");
-
-    if (hex.includes(Global.keys.wordBack)) {
-      const phrases = input.split(" ");
-      phrases.pop();
-
-      input = phrases.join(" ")
-    } else if (hex.includes(Global.keys.back)) {
-      input = input.substr(0, input.length - 1)
-    }
-
-    UserInput.input = input;
-    shouldRender = shouldRender || keepPrefix();
-    shouldRender = shouldRender || stylizeTerminal();
-    if (shouldRender)
-      renderCMDLine();
+  Global.cmdLine = blessed.textbox({
+    parent: form,
+    inputOnFocus: true,
+    tags: true,
+    name: "command",
+    style: {
+      fg: "yellow"
+    },
+    value: prefix
   })
 
-  cmdLine.key("tab", () => processTabComplete())
+  Global.cmdLine.focus();
+}
 
-  cmdLine.key(" ", () => resetHelpCMDs())
+function setForm() {
+  const { screen } = Global;
 
-  cmdLine.focus();
-  addQuit(cmdLine)
-
-  return form
+  return blessed.form({
+    keys: true,
+    parent: screen,
+    bg: "red",
+    height: "shrink",
+    align: 'center',
+    width: "100%",
+    top: "99%",
+  })
 }

@@ -1,8 +1,6 @@
-import blessed from "blessed";
 import fs from "fs";
 import { Subscriber } from 'rxjs';
-import { Global } from './Global/Global';
-import { UserInput } from './Global/UserInput';
+import { Global } from '../Global/Global';
 
 /**
  * Joins an array to a single variable and returns it
@@ -28,21 +26,7 @@ export function debug(str: string, ...args: any[]) {
   fs.appendFileSync("debug.txt", str + " " + args.map(e => e.toString()).join(" ") + "\n");
 }
 
-/**
- * Adds a quit event for the user to quit this terminal
- * @param node The node that should be added the event to
- */
-export function addQuit(node: blessed.Widgets.NodeWithEvents) {
-  node.key(['escape', 'q', 'C-c'], () => {
-    if (UserInput.input.length === 0) {
-      process.exit(0);
-    }
-    else {
-      UserInput.input = ""
-      renderCMDLine();
-    }
-  });
-}
+
 /**
  * Concats arrays to one single array
  * @param arrays The arrays that should be concated
