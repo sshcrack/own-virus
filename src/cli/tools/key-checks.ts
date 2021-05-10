@@ -35,7 +35,7 @@ export function isWordDelete(key: RLKey) {
 }
 
 export function isTab(key: RLKey) {
-  return key.name !== "tab"
+  return key.name === "tab"
 }
 
 export function isAbort(key: RLKey) {
