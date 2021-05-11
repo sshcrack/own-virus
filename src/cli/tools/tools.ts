@@ -22,8 +22,8 @@ export function joinArray<T, S>(arr: T[], func: (curr: S, el: T, i: number) => S
  * @param str What should be debugged
  * @param args More information
  */
-export function debug(str: string, ...args: any[]) {
-  fs.appendFileSync("debug.txt", str + " " + args.map(e => e.toString()).join(" ") + "\n");
+export function debug(str: any, ...args: any[]) {
+  fs.appendFileSync("debug.txt", str?.toString() + " " + args.map(e => e?.toString()).join(" ") + "\n");
 }
 
 

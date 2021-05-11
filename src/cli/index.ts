@@ -72,25 +72,6 @@ function onLoaded() {
 
   addFuncs.forEach(func => func())
 
-  /**
-   * Runs on every screen rerender
-   */
-  screen.on("render", () => {
-    const { historyElement: history, } = Global;
-
-    /**
-     * Updates the history
-     */
-    const newHistory = Global.history.map(e => {
-      if (e.command)
-        return e.prefix + chalk.green(e.text)
-
-      return e.text;
-    }).join("\n");
-
-    if (history.getContent() !== newHistory)
-      history.setContent(newHistory)
-  })
 
   UserInput.inputEvent.subscribe(input => {
     const prefix = UserInput.prefix;
@@ -102,6 +83,23 @@ function onLoaded() {
     const newLine = prefix + input
 
     cmdLine.setValue(newLine)
+    screen.render();
+  })
+
+  Global.historyEvent.subscribe(info => {
+    const { historyElement: history, } = Global;
+
+    /**
+     * Updates the history
+     */
+    const newHistory = info.map(e => {
+      if (e.command)
+        return e.prefix + chalk.green(e.text)
+
+      return e.text;
+    }).join("\n");
+
+    history.setContent(newHistory)
     screen.render();
   })
 

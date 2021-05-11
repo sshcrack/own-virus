@@ -1,7 +1,6 @@
-import { Observable } from 'rxjs';
 import { Command, ForegroundCommand } from '../commands/basic-command';
 import { Global } from '../Global/Global';
-import { finishObservable } from '../tools/tools';
+import { Notifier } from '../Notifier/Notifier';
 
 /**
  * Runs commands and gives their result trough an observable
@@ -9,33 +8,38 @@ import { finishObservable } from '../tools/tools';
  * @returns The command output through an observable
  */
 export function processCommand(fullCmd: string) {
-  return new Observable<string>(observer => {
+  return new Notifier<string>(observer => {
     const args = fullCmd.split(" ")
     const command = args.shift();
     const commands = Global.commands;
 
     const found: Command = commands.find(e => e.name.toLowerCase() === command.toLowerCase());
-    const res = found?.execute(args);
 
-    if (res instanceof Observable) {
-      const isForeground = Object.keys(found).includes("on_input");
+    const res = found?.execute(args);
+    if (!res) {
+      observer.finish(Global.notFoundMSG())
+      return;
+    }
+
+    if (res instanceof Notifier) {
+      const isForeground = typeof found["on_input"] === "function"
       if (isForeground)
         Global.currCommand = found as ForegroundCommand;
 
       res.subscribe(data => {
-        observer.next(data.join("\n"));
+        observer.update(data.join("\n"));
       })
 
-      res.toPromise().then(_e => {
+      res.listenFinish(() => {
         if (isForeground)
           Global.currCommand = undefined;
 
-        observer.complete();
+        observer.finish();
       })
       return;
     }
 
-    finishObservable(res?.join("\n") ?? Global.notFoundMSG(), observer);
+    observer.finish(res?.join("\n"))
     return
   });
 

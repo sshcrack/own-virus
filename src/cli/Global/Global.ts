@@ -1,16 +1,19 @@
 import blessed from "blessed";
 import chalk from "chalk";
+import onChange from "on-change";
 import ws from "ws";
+import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { Command, ForegroundCommand } from '../commands/basic-command';
+import { ClearCommand } from '../commands/clear';
 import { ExitCommand } from '../commands/exit';
 import { HelpCommand } from '../commands/help';
 import { ListCommand } from '../commands/list';
-import { ClearCommand } from '../commands/clear';
 import { LoginCommand } from '../commands/login';
-import { HistoryInfo } from '../interfaces/historyInfo';
-import { center } from '../tools/tools';
-import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { ShellCommand } from '../commands/shell';
+import { HistoryInfo } from '../interfaces/historyInfo';
+import { Notifier } from '../Notifier/Notifier';
+import { Updater } from '../Notifier/Updater';
+import { center } from '../tools/tools';
 
 export class Global {
   /**
@@ -47,10 +50,20 @@ export class Global {
    */
   static beforeTabComplete: string;
 
+  static history: HistoryInfo[] = onChange([], () =>
+    Global._subscriberHistory.update(Global.history));
   /**
    * Current history info
    */
-  static history: HistoryInfo[] = [];
+
+  static historyEvent = new Notifier<HistoryInfo[]>(e =>
+    Global._subscriberHistory = e);
+
+
+  /**
+   * This notifies all subscribed functions
+   */
+  private static _subscriberHistory: Updater<HistoryInfo[]>;
 
   /**
    * The websocket the client is connected with

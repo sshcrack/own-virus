@@ -1,47 +1,46 @@
 import chalk from 'chalk';
-import { Observable } from 'rxjs';
 import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
+import { Notifier } from '../Notifier/Notifier';
 import { listDevices } from '../socket-master';
-import { center, finishObservable } from '../tools/tools';
+import { center } from '../tools/tools';
 import { BackgroundCommand } from "./basic-command";
 
 export class LoginCommand implements BackgroundCommand {
   name = "login"
   help = "Log into a device connected to this network"
   public execute(args: string[]) {
-    return new Observable<string[]>(observer => {
+    return new Notifier<string[]>(observer => {
       const run = async () => {
         const deviceID = args.shift();
         if (!deviceID) {
-          finishObservable([
+          observer.finish([
             center(chalk`{yellow Invalid arguments.}`),
             center(chalk`{red Make sure you provide a device id}`)
-          ], observer)
+          ])
           return
         }
 
-        observer.next([center(chalk`{yellow Getting devices...}`)])
+        observer.update([center(chalk`{yellow Getting devices...}`)])
         const found = await this.findDevice(deviceID);
 
         if (!found) {
-          finishObservable([
+          observer.finish([
             center(chalk`{yellow Device could not be found.}`)
-          ], observer)
+          ])
           return;
         }
 
         if (!found.connected) {
-          finishObservable([
+          observer.finish([
             center(chalk`{red Device is not connected}`)
-          ], observer)
+          ])
           return;
         }
 
         UserInput.prefix = chalk`{gray ${found.id}} ${Global.standardPrefix}`
-        observer.next([center(`green{Logged in.}`)]);
-        observer.complete();
+        observer.finish([center(`green{Logged in.}`)]);
       }
 
       run();

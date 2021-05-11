@@ -7,7 +7,7 @@ import { processTabComplete } from '../processor/tabcomplete';
 import { isAbort, isAlphanumericKey, isBackspace, isReturn, isSpecial, isTab, isWordDelete } from '../tools/key-checks';
 import { renderCMDLine, resetHelpCMDs } from '../tools/tools';
 import { checkArrowKeys } from './arrowFunc';
-import { OnCommandSubmit } from './command-submit';
+import { OnCommandSubmit, resetCommandLine } from './command-submit';
 import { keepPrefix } from './prefix';
 import { stylizeTerminal } from './terminal-color';
 
@@ -24,6 +24,7 @@ export function getCommandElements() {
   process.stdin.on("keypress", (_raw: string, key: RLKey) => {
     let { input } = UserInput;
 
+    if (!key || !key?.name) return;
     if (isTab(key))
       return processTabComplete()
 
@@ -37,6 +38,7 @@ export function getCommandElements() {
       }
 
       Global.currCommand.on_input(UserInput.input);
+      resetCommandLine();
       return;
     }
 

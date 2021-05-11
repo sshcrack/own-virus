@@ -8,14 +8,12 @@ import { renderCMDLine, resetHelpCMDs } from '../tools/tools';
  * Displays command feedback and runs commands
  */
 export function OnCommandSubmit() {
-  const cmdLine = Global.cmdLine;
   const currPrefix = UserInput.prefix;
 
   const fullCMD = UserInput.input
   const result = processCommand(fullCMD);
-  if (fullCMD.length === 0) {
+  if (fullCMD.length === 0)
     return;
-  }
 
   const index = Global.history.push({
     command: true,
@@ -37,7 +35,7 @@ export function OnCommandSubmit() {
     renderCMDLine();
   })
 
-  result.toPromise().then(() => {
+  result.listenFinish(() => {
     const entry = Global.history[index]
     if (entry) {
       if (entry.command)
@@ -48,7 +46,11 @@ export function OnCommandSubmit() {
     renderCMDLine();
   })
 
+  resetCommandLine();
+}
 
+export function resetCommandLine() {
+  const { cmdLine } = Global;
 
   UserInput.input = ""
   cmdLine.focus();

@@ -1,4 +1,5 @@
 import { RLKey } from '../interfaces/readline';
+const replaceControlChars = /[\u0000-\u001F\u007F-\u009F]/g
 
 /**
  * Check if the given code is special
@@ -14,7 +15,8 @@ export function isSpecial(key: RLKey) {
  */
 
 export function isKeyCombo(key: RLKey) {
-  return key.sequence.length >= 2
+  const replaced = key.sequence.replace(replaceControlChars, "")
+  return key.sequence.length >= 2 || replaced.length < key.sequence.length
 }
 
 /**
@@ -31,7 +33,7 @@ export function isBackspace(key: RLKey) {
 }
 
 export function isWordDelete(key: RLKey) {
-  return key.ctrl && key.sequence === "\\x17"
+  return key.sequence === "\u001b\b"
 }
 
 export function isTab(key: RLKey) {

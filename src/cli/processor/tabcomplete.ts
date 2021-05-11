@@ -9,7 +9,7 @@ export function processTabComplete() {
   const currCMD = UserInput.input;
 
   const currComplete = findTabComplete(Global.beforeTabComplete ?? currCMD, Global.tabOffset);
-  if (currCMD !== currComplete)
+  if (Global.tabOffset === 0)
     Global.beforeTabComplete = currCMD;
 
   Global.tabOffset++;
@@ -23,19 +23,28 @@ export function processTabComplete() {
  * @param offset The amount of how many times the user pressed tab
  */
 export function findTabComplete(str: string, offset: number) {
+  let cmdOffset = offset;
+  let tabOffset = offset;
+
   const args = str.split(" ")
   const command = args.shift();
   const commands = Global.commands;
 
-  const matchingCommands = commands.filter(e => e.name.startsWith(command));
-  if (matchingCommands.length === 0) return str;
+  const validCompletion = commands.filter(e => e.name.startsWith(command)).map(e => e.name);
+  if (validCompletion.length === 0) return str;
 
-  if (offset >= matchingCommands.length)
-    offset -= matchingCommands.length;
+  validCompletion.push(command);
 
-  const cmd = matchingCommands[offset];
-  if (!cmd)
+  while (cmdOffset >= validCompletion.length)
+    cmdOffset -= validCompletion.length;
+
+  const cmdStr = validCompletion[cmdOffset];
+  if (!cmdStr)
     return str;
+
+  const cmd = commands.find(e => e.name === cmdStr);
+  if (!cmd)
+    return cmdStr;
 
   if (args.length === 0)
     return cmd?.name;
@@ -45,8 +54,11 @@ export function findTabComplete(str: string, offset: number) {
     return str;
 
 
-  if (offset >= complete.length)
-    offset -= complete.length;
+  while (tabOffset >= complete.length)
+    tabOffset -= complete.length;
 
-  return `${command} ${complete[offset]}`;
+  const currComplete = complete[tabOffset];
+  if (!currComplete)
+    return str;
+  return `${command} ${currComplete}`;
 }

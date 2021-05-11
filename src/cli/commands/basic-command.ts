@@ -1,4 +1,4 @@
-import { Observable } from 'rxjs';
+import { Notifier } from '../Notifier/Notifier';
 
 export type Command = BackgroundCommand | ForegroundCommand;
 
@@ -29,7 +29,7 @@ interface _StructureCommand {
    * @param args The arguments given by the user
    * @returns Observable which determines state of the command and output
    */
-  execute(args: string[]): Observable<string[]> | string[]
+  execute(args: string[]): Notifier<string[]> | string[]
   /**
    * Used for tab completion
    * @param args The full command, that the user entered
