@@ -3,9 +3,9 @@ import { Global } from '../Global/Global';
 import { Notifier } from '../Notifier/Notifier';
 import { listDevices } from '../socket-master';
 import { center, middle } from '../tools/tools';
-import { BackgroundCommand } from './basic-command';
+import { BackgroundCommand } from '../interfaces/basic-command';
 
-export class ListCommand implements BackgroundCommand {
+export default class ListCommand implements BackgroundCommand {
   name = "list"
   help = "Get a list of all devices connected"
   public execute(_args: string[]) {
@@ -18,8 +18,8 @@ export class ListCommand implements BackgroundCommand {
           Global.fetchedClients = devices;
           observer.finish([
             title,
-            ...devices.map(e => {
-              return middle(`    ${e.id}`, `${e.connected ? chalk.green("Online") : chalk.red("Offline")}    `)
+            ...devices.map((e, i) => {
+              return middle(`    ${e.id} (Index: ${i})`, `${e.connected ? chalk.green("Online") : chalk.red("Offline")}    `)
             })
           ])
         })

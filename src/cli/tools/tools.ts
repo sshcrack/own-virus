@@ -92,3 +92,28 @@ export function finishObservable<T>(msg: T, observer: Subscriber<T>) {
 export function renderCMDLine() {
   Global.screen.render();
 }
+
+/**
+ * Returns build/main if used with normal node
+ * Returns src if used with ts-node
+ * @returns either build/main or src
+ */
+export function getDirToUse() {
+  let runDir = "build/main";
+
+  if (process.argv[0].endsWith("/ts-node")) {
+    runDir = "src";
+  }
+
+  return runDir;
+}
+
+/**
+ * Returns .js if normal node is used
+ * Returns .ts if used with ts-node
+ * @returns either .js or .ts
+ */
+export function getExtensionToUse() {
+  let dirToUse = getDirToUse();
+  return dirToUse === "src" ? ".ts" : ".js"
+}

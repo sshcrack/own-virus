@@ -38,6 +38,7 @@ export class UserInput {
    */
   static set prefix(str: string) {
     this._currPrefix = str;
+    this._subscriberInput.update(this._currInput)
   }
 
 

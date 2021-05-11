@@ -1,11 +1,11 @@
 import blessed from "blessed";
-import chalk from 'chalk';
 import fs from "fs";
 import ws from "ws";
 import { getCommandElements as addCMDLine } from './cmd/cmd-line';
 import { Global } from './Global/Global';
 import { UserInput } from './Global/UserInput';
 import { verifyMaster } from './socket-master';
+import { loadCommands } from './tools/command-loader';
 import { getNav as addNav } from './top/nav';
 
 const { URL } = process.env;
@@ -43,6 +43,7 @@ Global.socket.on("open", async () => {
     process.exit(0);
   }
 
+  await loadCommands();
   onLoaded();
 })
 
@@ -71,37 +72,5 @@ function onLoaded() {
   ]
 
   addFuncs.forEach(func => func())
-
-
-  UserInput.inputEvent.subscribe(input => {
-    const prefix = UserInput.prefix;
-    const { cmdLine } = Global;
-
-    /**
-   * Updates command line values to show the right input
-   */
-    const newLine = prefix + input
-
-    cmdLine.setValue(newLine)
-    screen.render();
-  })
-
-  Global.historyEvent.subscribe(info => {
-    const { historyElement: history, } = Global;
-
-    /**
-     * Updates the history
-     */
-    const newHistory = info.map(e => {
-      if (e.command)
-        return e.prefix + chalk.green(e.text)
-
-      return e.text;
-    }).join("\n");
-
-    history.setContent(newHistory)
-    screen.render();
-  })
-
   screen.render();
 }

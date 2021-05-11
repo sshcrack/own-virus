@@ -2,19 +2,19 @@ import chalk from 'chalk';
 import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
+import { BackgroundCommand } from "../interfaces/basic-command";
 import { Notifier } from '../Notifier/Notifier';
 import { listDevices } from '../socket-master';
 import { center } from '../tools/tools';
-import { BackgroundCommand } from "./basic-command";
 
-export class LoginCommand implements BackgroundCommand {
+export default class LoginCommand implements BackgroundCommand {
   name = "login"
   help = "Log into a device connected to this network"
   public execute(args: string[]) {
     return new Notifier<string[]>(observer => {
       const run = async () => {
-        const deviceID = args.shift();
-        if (!deviceID) {
+        const deviceIndex = args.shift();
+        if (!deviceIndex) {
           observer.finish([
             center(chalk`{yellow Invalid arguments.}`),
             center(chalk`{red Make sure you provide a device id}`)
@@ -23,7 +23,7 @@ export class LoginCommand implements BackgroundCommand {
         }
 
         observer.update([center(chalk`{yellow Getting devices...}`)])
-        const found = await this.findDevice(deviceID);
+        const found = await this.findDeviceIndex(deviceIndex);
 
         if (!found) {
           observer.finish([
@@ -39,8 +39,8 @@ export class LoginCommand implements BackgroundCommand {
           return;
         }
 
-        UserInput.prefix = chalk`{gray ${found.id}} ${Global.standardPrefix}`
-        observer.finish([center(`green{Logged in.}`)]);
+        UserInput.prefix = chalk`{gray $${deviceIndex}} ${Global.standardPrefix}`
+        observer.finish([center(chalk`{green Logged in.}`)]);
       }
 
       run();
@@ -48,19 +48,19 @@ export class LoginCommand implements BackgroundCommand {
   }
 
   /**
-   * Finds a device which is connected to this network
-   * @param id The device id
-   * @retuns The device
-   */
-  private findDevice(id: string): Promise<SingleClient> {
+ * Finds a device by index which is connected to this network
+ * @param id The device id
+ * @retuns The device
+ */
+  private findDeviceIndex(index: string): Promise<SingleClient> {
     return new Promise(resolve => {
       listDevices().then(devices => {
-        resolve(devices.find(e => e.id === id));
+        resolve(devices.find((_e, i) => i.toString() === index));
       });
     });
   }
 
   public tab_complete(_str) {
-    return Global.fetchedClients.map(e => e.id) ?? []
+    return Global.fetchedClients.map((e, i) => { return { connected: e.connected, index: i } }).filter(e => e.connected).map(e => e.index.toString()) ?? []
   }
 }

@@ -1,8 +1,8 @@
 import { Notifier } from '../Notifier/Notifier'
 import { Updater } from '../Notifier/Updater'
-import { ForegroundCommand } from "./basic-command"
+import { ForegroundCommand } from "../interfaces/basic-command"
 
-export class ShellCommand implements ForegroundCommand {
+export default class ShellCommand implements ForegroundCommand {
   name = "shell"
   help = "Open cmd on a remote client"
 

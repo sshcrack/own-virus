@@ -1,11 +1,12 @@
 
 import blessed from "blessed";
+import chalk from 'chalk';
 import { Global } from '../Global/Global';
 import { UserInput } from '../Global/UserInput';
 import { RLKey } from '../interfaces/readline';
 import { processTabComplete } from '../processor/tabcomplete';
 import { isAbort, isAlphanumericKey, isBackspace, isReturn, isSpecial, isTab, isWordDelete } from '../tools/key-checks';
-import { renderCMDLine, resetHelpCMDs } from '../tools/tools';
+import { debug, renderCMDLine, resetHelpCMDs } from '../tools/tools';
 import { checkArrowKeys } from './arrowFunc';
 import { OnCommandSubmit, resetCommandLine } from './command-submit';
 import { keepPrefix } from './prefix';
@@ -84,6 +85,23 @@ function setHistory() {
     scrollable: true,
     alwaysScroll: true,
   })
+
+  Global.historyEvent.subscribe(info => {
+    const { historyElement: history, } = Global;
+
+    /**
+     * Updates the history
+     */
+    const newHistory = info.map(e => {
+      if (e.command)
+        return e.prefix + chalk.green(e.text)
+
+      return e.text;
+    }).join("\n");
+
+    history.setContent(newHistory)
+    screen.render();
+  })
 }
 
 function setCMDLine(form: blessed.Widgets.FormElement<unknown>) {
@@ -98,6 +116,20 @@ function setCMDLine(form: blessed.Widgets.FormElement<unknown>) {
       fg: "yellow"
     },
     value: prefix
+  })
+
+  UserInput.inputEvent.subscribe(input => {
+    debug("Update input")
+    const prefix = UserInput.prefix;
+    const { cmdLine, screen } = Global;
+
+    /**
+   * Updates command line values to show the right input
+   */
+    const newLine = prefix + input
+
+    cmdLine.setValue(newLine)
+    screen.render();
   })
 
   Global.cmdLine.focus();

@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import { Global } from '../Global/Global';
 import { center } from '../tools/tools';
-import { BackgroundCommand } from "./basic-command";
+import { BackgroundCommand } from "../interfaces/basic-command";
 
-export class HelpCommand implements BackgroundCommand {
+export default class HelpCommand implements BackgroundCommand {
   name = "help"
   help = "The command you are using"
 

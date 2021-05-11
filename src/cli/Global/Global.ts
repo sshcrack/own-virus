@@ -3,13 +3,7 @@ import chalk from "chalk";
 import onChange from "on-change";
 import ws from "ws";
 import { SingleClient } from '../../server/interfaces/user_managing/clients';
-import { Command, ForegroundCommand } from '../commands/basic-command';
-import { ClearCommand } from '../commands/clear';
-import { ExitCommand } from '../commands/exit';
-import { HelpCommand } from '../commands/help';
-import { ListCommand } from '../commands/list';
-import { LoginCommand } from '../commands/login';
-import { ShellCommand } from '../commands/shell';
+import { Command, ForegroundCommand } from '../interfaces/basic-command';
 import { HistoryInfo } from '../interfaces/historyInfo';
 import { Notifier } from '../Notifier/Notifier';
 import { Updater } from '../Notifier/Updater';
@@ -75,14 +69,7 @@ export class Global {
    */
   static standardPrefix = `${chalk.white(">  ")}`;
 
-  static commands: Command[] = [
-    new HelpCommand(),
-    new ListCommand(),
-    new ExitCommand(),
-    new LoginCommand(),
-    new ClearCommand(),
-    new ShellCommand()
-  ]
+  static commands: Command[] = []
 
   static notFoundMSG = () => {
     let lines = [

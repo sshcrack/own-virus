@@ -1,4 +1,4 @@
-import { Command, ForegroundCommand } from '../commands/basic-command';
+import { Command, ForegroundCommand } from '../interfaces/basic-command';
 import { Global } from '../Global/Global';
 import { Notifier } from '../Notifier/Notifier';
 
