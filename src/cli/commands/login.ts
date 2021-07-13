@@ -1,6 +1,7 @@
 import chalk from 'chalk';
 import { SingleClient } from '../../server/interfaces/user_managing/clients';
 import { Global } from '../Global/Global';
+import { User } from '../Global/User';
 import { UserInput } from '../Global/UserInput';
 import { BackgroundCommand } from "../interfaces/basic-command";
 import { Notifier } from '../Notifier/Notifier';
@@ -39,6 +40,10 @@ export default class LoginCommand implements BackgroundCommand {
           return;
         }
 
+        User.currentClient = {
+          index: parseInt(deviceIndex),
+          ...found
+        }
         UserInput.prefix = chalk`{gray $${deviceIndex}} ${Global.standardPrefix}`
         observer.finish([center(chalk`{green Logged in.}`)]);
       }

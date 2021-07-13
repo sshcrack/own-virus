@@ -1,8 +1,9 @@
 export interface TerminatedSub {
-  client: string
+  client: string,
+  pid: number
 }
 
 export interface TerminatedInterface {
   name: "terminated",
-  data: TerminatedSub;
+  data: TerminatedSub
 }

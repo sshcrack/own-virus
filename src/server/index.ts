@@ -1,26 +1,42 @@
 import express from "express";
-import ws from "ws";
+import https from "https";
+import fs from "fs"
+import ws, { Server as WebSocketServer } from "ws";
 import { AddClient } from './client-config';
 import { ClientsInterface, WSEvent } from './interfaces/core/base';
-import { StatusInterface } from './interfaces/core/status';
-import { ExecInfo } from './interfaces/remote/instruction';
-import { ShellDataInterface } from './interfaces/remote/shell';
+import { KillInterface } from './interfaces/remote/killproc';
 import { getClients } from './responses/clients';
+import { handleInstruction } from './responses/instruction';
+import { handleKillShells } from './responses/kill_shells';
 import { sendPing } from './responses/ping';
+import { handleShellInput } from './responses/shell_input';
+import { handleShellStart } from './responses/shell_started';
 import { verifyClient } from './responses/verify';
+import { sendWelcomeMSG } from './responses/welcome';
 
 const app = express();
-const port = 3000;
+const { PORT: port } = process.env;
+
+const privateKey = fs.readFileSync(`./src/cert/privkey.pem`, "utf-8")
+const fullchain = fs.readFileSync(`./src/cert/fullchain.pem`, "utf-8")
+
+
+const httpsServer = https.createServer({
+  key: privateKey,
+  cert: fullchain
+}, app)
+
+const wsServer = new WebSocketServer({
+  server: httpsServer
+});
 
 let onlineClients: ClientsInterface = {};
 let master: ws;
 
-const wsServer = new ws.Server({ noServer: true });
 wsServer.on('connection', socket => {
   let verified = false;
   let id;
   sendWelcomeMSG(socket);
-
 
   socket.on('message', async message => {
 
@@ -61,59 +77,41 @@ wsServer.on('connection', socket => {
           break;
 
         case "instruction":
-          handleInstruction(verified, event.data);
+          handleInstruction(verified, event.data, onlineClients);
           break;
 
         case "terminated":
           if (verified)
             break;
 
-          const resp: WSEvent = {
+          const terminatedResp: WSEvent = {
             name: "terminated",
             data: {
-              client: id
+              client: id,
+              pid: event.data.pid
             }
           }
 
-          master.send(JSON.stringify(resp))
+          master.send(JSON.stringify(terminatedResp))
           break;
 
         case "shell":
-          const data = event.data;
-          if (verified && data.direction === "to_client") {
-            const clientID = data.client;
-            const client = onlineClients[clientID];
-            if (!client) {
-              console.log("Client not found");
-              break;
-            }
-
-            const resp: ShellDataInterface = {
-              name: "shell",
-              data: {
-                direction: data.direction,
-                text: data.text
-              }
-            }
-            client.send(JSON.stringify(resp));
-            return;
-          }
-
-          if (data.direction === "from_client") {
-            const resp: ShellDataInterface = {
-              name: "shell",
-              data: {
-                client: id,
-                direction: "from_client",
-                text: data.text
-              }
-            }
-
-            const toSend = JSON.stringify(resp);
-            master.send(toSend)
-          }
-
+          handleShellInput(verified, event.data, onlineClients, master, id);
           break;
+
+        case "killshells":
+          if (!verified)
+            break;
+
+          handleKillShells(event.data, onlineClients);
+          break;
+
+        case "shellstarted":
+          if (!id) break;
+
+          handleShellStart(event.data, master, id)
+          break;
+
         default:
           break;
       }
@@ -125,46 +123,20 @@ wsServer.on('connection', socket => {
   socket.on("close", () => {
     console.log("Deleting id", id, "...")
     delete onlineClients[id]
+
+    Object.values(onlineClients).forEach(client => {
+
+      const kill: KillInterface = {
+        name: "killshells",
+        data: {}
+      }
+      client.send(JSON.stringify(kill))
+    })
   })
 });
 
-function handleInstruction(verified: boolean, json: ExecInfo) {
-  if (!verified) {
-    console.log("Not verified.")
-    return;
-  }
-
-  const client = json.client;
-  const target = onlineClients[client];
-  if (!target) {
-    console.log("Client not found")
-    return;
-  }
-
-  target.send(JSON.stringify({
-    name: "instruction",
-    data: json
-  }));
-}
 
 
-
-function sendWelcomeMSG(socket: ws) {
-  const statusResp: StatusInterface = {
-    name: "status",
-    data: {
-      status: "connected"
-    }
-  }
-
-  socket.send(JSON.stringify(statusResp))
-}
-
-const server = app.listen(port, () => {
+httpsServer.listen(port, () => {
   console.log("Listening on port", port)
-});
-server.on('upgrade', (request, socket, head) => {
-  wsServer.handleUpgrade(request, socket, head, socket => {
-    wsServer.emit('connection', socket, request);
-  });
 });

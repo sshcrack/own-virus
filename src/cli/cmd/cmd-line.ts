@@ -6,7 +6,7 @@ import { UserInput } from '../Global/UserInput';
 import { RLKey } from '../interfaces/readline';
 import { processTabComplete } from '../processor/tabcomplete';
 import { isAbort, isAlphanumericKey, isBackspace, isReturn, isSpecial, isTab, isWordDelete } from '../tools/key-checks';
-import { debug, renderCMDLine, resetHelpCMDs } from '../tools/tools';
+import { renderCMDLine, resetHelpCMDs } from '../tools/tools';
 import { checkArrowKeys } from './arrowFunc';
 import { OnCommandSubmit, resetCommandLine } from './command-submit';
 import { keepPrefix } from './prefix';
@@ -22,10 +22,16 @@ export function getCommandElements() {
   setCMDLine(form);
   setHistory();
 
-  process.stdin.on("keypress", (_raw: string, key: RLKey) => {
+  process.stdin.on("keypress", (raw: string, key: RLKey) => {
     let { input } = UserInput;
 
-    if (!key || !key?.name) return;
+    if (!key || !key?.name) {
+      let i = UserInput.input;
+      i += raw
+
+      UserInput.input = i;
+      return;
+    }
     if (isTab(key))
       return processTabComplete()
 
@@ -119,7 +125,6 @@ function setCMDLine(form: blessed.Widgets.FormElement<unknown>) {
   })
 
   UserInput.inputEvent.subscribe(input => {
-    debug("Update input")
     const prefix = UserInput.prefix;
     const { cmdLine, screen } = Global;
 

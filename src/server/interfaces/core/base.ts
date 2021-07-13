@@ -1,12 +1,14 @@
 import ws from "ws"
+import { InstructionInterface } from '../remote/instruction'
+import { KillInterface } from '../remote/killproc'
+import { ShellDataInterface } from '../remote/shell'
+import { ShellStarted } from '../remote/shellstarted'
+import { TerminatedInterface } from '../remote/terminated'
 import { ClientsInterfaceResponse, GetClientsInterface } from '../user_managing/clients'
 import { IDInterface } from '../user_managing/id'
-import { InstructionInterface } from '../remote/instruction'
 import { PingInterface } from '../user_managing/ping'
-import { ShellDataInterface } from '../remote/shell'
-import { StatusInterface } from './status'
 import { VerifiedInterface, VerifyInterface } from '../user_managing/verify'
-import { TerminatedInterface } from '../remote/terminated'
+import { StatusInterface } from './status'
 
 export type WSEvent = VerifyInterface |
   VerifiedInterface |
@@ -17,7 +19,9 @@ export type WSEvent = VerifyInterface |
   IDInterface |
   StatusInterface |
   ShellDataInterface |
-  TerminatedInterface
+  TerminatedInterface |
+  KillInterface |
+  ShellStarted
 
 export interface ClientsInterface {
   [key: string]: ws

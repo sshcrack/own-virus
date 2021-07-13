@@ -21,5 +21,5 @@ export interface LaunchInterface {
 
 export interface LaunchShellInterface {
   exec_type: "shell"
-  client: string,
+  client: string
 }

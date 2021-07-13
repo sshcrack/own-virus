@@ -1,4 +1,6 @@
+console.log("Importing modules...")
 import blessed from "blessed";
+import chalk from 'chalk';
 import fs from "fs";
 import ws from "ws";
 import { getCommandElements as addCMDLine } from './cmd/cmd-line';
@@ -26,10 +28,14 @@ const loading = blessed.loading({
   top: "50%"
 })
 
-loading.setText("Connecting to websocket...")
+console.log("Connecting...")
+loading.setContent(chalk`Establishing connection...\nHost: {yellow ${URL}}`)
+loadingScreen.append(loading)
 loadingScreen.render();
 
-Global.socket = new ws(URL);
+Global.socket = new ws(URL, {
+  rejectUnauthorized: false
+});
 Global.socket.on("open", async () => {
   loading.setText("Verifying...")
   loadingScreen.render();
