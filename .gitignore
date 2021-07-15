@@ -10,3 +10,4 @@ coverage
 yarn.lock
 .env
 debug.txt
+package-lock.json
