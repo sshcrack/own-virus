@@ -1,5 +1,6 @@
 import express from "express";
 import https from "https";
+import beautify from "json-beautify"
 import fs from "fs"
 import ws, { Server as WebSocketServer } from "ws";
 import { AddClient } from './client-config';
@@ -42,6 +43,7 @@ wsServer.on('connection', socket => {
 
     try {
       const event: WSEvent = JSON.parse(message.toString())
+      if(event?.name !== "ping") console.log(beautify(event, null, 2, 80))
 
       switch (event.name) {
         case "ping":
