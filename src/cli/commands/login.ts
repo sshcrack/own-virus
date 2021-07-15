@@ -44,7 +44,7 @@ export default class LoginCommand implements BackgroundCommand {
           index: parseInt(deviceIndex),
           ...found
         }
-        UserInput.prefix = chalk`{gray $${deviceIndex}} ${Global.standardPrefix}`
+        UserInput.prefix = chalk`{cyan $${deviceIndex}} ${Global.standardPrefix}`
         observer.finish([center(chalk`{green Logged in.}`)]);
       }
 

@@ -78,8 +78,17 @@ export default class ShellCommand implements ForegroundCommand {
 
       socket.send(JSON.stringify(startReq));
 
-      observer.update([center("Waiting for shell to start...")])
+      observer.update([center(chalk`Waiting for shell to start...\n{yellow Timeout}{gray :}{red 15s} `)])
+
+      let connected = false
+      setTimeout(() => {
+        if (connected)
+          return
+        this.onMSG = () => { }
+        observer.finish([center(chalk`{red Timed out.}`)])
+      }, 15000)
       this.onMSG = event => {
+        connected = true
         switch (event.name) {
           case "shellstarted":
             const startedData = event.data;
@@ -134,4 +143,5 @@ export default class ShellCommand implements ForegroundCommand {
 
     Global.socket.send(JSON.stringify(resp));
   }
+
 }
